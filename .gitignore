@@ -47,6 +47,7 @@ audit-report*.json
 htmlcov/
 test-results/
 playwright-report/
+.playwright-cli/
 .DS_Store
 .idea/
 .vscode/

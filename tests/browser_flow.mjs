@@ -14,6 +14,13 @@ try{
  await page.getByText('已提取 3 页',{exact:true}).waitFor({timeout:60000});
  await page.locator('#analyzeBtn').click();await page.getByRole('button',{name:'确认并分析',exact:true}).click();
  await page.getByText('服务要求',{exact:true}).waitFor({timeout:60000});
+ await page.locator('#planningView .demo-outline').waitFor({state:'attached'});
+ const originalFile=await page.locator('#fileName').textContent();
+ await page.locator('[data-view="planning"]').click();
+ await page.getByLabel('暗标模式预览').check();
+ await page.locator('[data-view="workbench"]').click();
+ if(await page.locator('#fileName').textContent()!==originalFile)throw new Error('Preview changed the live task');
+ await page.getByText('服务要求',{exact:true}).waitFor();
  await page.waitForTimeout(800);
  await page.screenshot({path:output+'test-analysis.png',fullPage:true});
  await page.getByRole('button',{name:'第 1 页',exact:true}).first().click();
@@ -34,6 +41,10 @@ try{
  await page.getByRole('button',{name:'编辑章节',exact:true}).first().click();
  await page.locator('#modalBody textarea').first().fill('本章内容由人工编辑。企业名称：【待补充：企业名称】。');
  await page.getByRole('button',{name:'保存章节',exact:true}).click();
+ await page.getByText('本章内容由人工编辑。企业名称：【待补充：企业名称】。',{exact:true}).waitFor();
+ await page.locator('[data-view="templates"]').click();
+ await page.locator('#templatesView').getByRole('button',{name:'选入编制预览',exact:true}).first().click();
+ await page.locator('[data-view="workbench"]').click();
  await page.getByText('本章内容由人工编辑。企业名称：【待补充：企业名称】。',{exact:true}).waitFor();
  await page.screenshot({path:output+'test-draft.png',fullPage:true});
  const downloaded=page.waitForEvent('download');await page.locator('#exportBtn').click();

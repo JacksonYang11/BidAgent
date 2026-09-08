@@ -7,6 +7,9 @@ const state = {csrf:'', status:{}, tasks:[], task:null, analysis:null, tab:'requ
 const labels = {extract:'文件读取',extracting:'提取招标文字',ocr:'识别图片与扫描页',analyze:'招标文件分析',analyzing:'AI 分析招标文件',verifying:'核对原文引用',generate:'编制投标初稿',regenerate:'重写章节',outlining:'构建投标目录',writing:'撰写投标章节',check_model:'检查模型连接'};
 const statusLabels = {queued:'等待处理',running:'处理中',succeeded:'已完成',failed:'处理失败',cancelled:'已取消',interrupted:'已中断'};
 const groups = {requirements:'指标需求', scores:'评分要求', risks:'废标红线'};
+const viewNames = {workbench:'标书工作台',history:'我的任务',company:'企业资料',settings:'运行状态',
+  overview:'商机总览',opportunities:'全网标讯',expiry:'合约到期预警',analytics:'行业数据看板',
+  review:'AI 废标检查',templates:'标书模板库',knowledge:'企业知识库',planning:'编制方案预览'};
 const active = () => state.job && ['queued','running'].includes(state.job.status);
 const icons = () => window.lucide?.createIcons();
 
@@ -49,11 +52,12 @@ async function refreshStatus(){
 }
 async function refreshTasks(){state.tasks=await api('/tasks');$('taskCount').textContent=state.tasks.length;renderHistory();}
 function switchView(view){
+  if(!Object.hasOwn(viewNames,view))return;
   state.view=view;
-  for(const name of ['workbench','history','company','settings'])$(name+'View').hidden=name!==view;
+  for(const name of Object.keys(viewNames))$(name+'View').hidden=name!==view;
   for(const b of document.querySelectorAll('[data-view]'))b.classList.toggle('active',b.dataset.view===view);
-  $('breadcrumb').textContent={workbench:'标书工作台',history:'我的任务',company:'企业资料',settings:'运行状态'}[view];
-  $('pageTitle').textContent=view==='workbench'?'在线智能招投标Agent':{history:'我的投标任务',company:'企业资料',settings:'运行状态'}[view];
+  $('breadcrumb').textContent=viewNames[view];
+  $('pageTitle').textContent=view==='workbench'?'在线智能招投标Agent':view==='history'?'我的投标任务':viewNames[view];
   $('sidebar').classList.remove('open');
   if(view==='history')refreshTasks().catch(notifyError);
   if(view==='workbench')setTimeout(()=>renderPdf().catch(notifyError),30);
@@ -305,3 +309,5 @@ async function init(){
   if(state.status.active_jobs.length){const job=state.status.active_jobs[0];if(job.task_id!=='system')await openTask(job.task_id);trackJob(job);}
 }
 init().catch(notifyError);
+// The preview module receives navigation only, never API access or live task state.
+import('/static/demo.js').then(({initDemo})=>initDemo({navigate:switchView})).catch(notifyError);
