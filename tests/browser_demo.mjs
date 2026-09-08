@@ -38,7 +38,8 @@ try {
       const rect=e=>e.getBoundingClientRect().toJSON();
       const cover=card.querySelector('.demo-template-cover'),paper=card.querySelector('.demo-paper');
       return {card:rect(card),cover:rect(cover),paper:rect(paper),paperContent:[...paper.children].map(rect),
-        title:rect(card.querySelector('h2')),buttons:[...card.querySelectorAll('button')].map(rect)};
+        title:rect(card.querySelector('h2')),buttons:[...card.querySelectorAll('button')].map(rect),
+        textOverflow:[...card.querySelectorAll('h2,strong,p,button')].some(e=>e.scrollWidth>e.clientWidth+1||e.scrollHeight>e.clientHeight+1)};
     }));
     const contains=(outer,inner,inset=0)=>inner.left>=outer.left+inset-1&&inner.right<=outer.right-inset+1&&inner.top>=outer.top+inset-1&&inner.bottom<=outer.bottom-inset+1;
     const width=page.viewportSize().width;
@@ -46,6 +47,7 @@ try {
       assert.ok(contains(item.cover,item.paper,12),`Template ${index}: paper clipped or missing whitespace at ${width}px`);
       assert.ok(item.paperContent.every(r=>contains(item.paper,r,8)),`Template ${index}: paper text overflow at ${width}px`);
       assert.ok(contains(item.card,item.title,12),`Template ${index}: title overflow at ${width}px`);
+      assert.equal(item.textOverflow,false,`Template ${index}: overflowing text at ${width}px`);
       assert.ok(item.buttons.every(r=>contains(item.card,r,12)),`Template ${index}: button clipping at ${width}px`);
       assert.ok(item.buttons.every(r=>r.top>=item.title.bottom+8),`Template ${index}: title/button overlap at ${width}px`);
       for(const peer of layout.slice(0,index).filter(p=>Math.abs(p.card.top-item.card.top)<1)){
@@ -150,6 +152,17 @@ try {
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'templates overflow at '+width);
     await page.screenshot({path:output+`demo-templates-${width}.png`,fullPage:true});
   }
+  // Stress only the browser DOM; the preset data and backend stay untouched.
+  const templateHeadings=page.locator('.demo-template').first().locator('h2,.demo-paper strong');
+  const originalHeadings=await templateHeadings.allTextContents();
+  await templateHeadings.evaluateAll(elements=>elements.forEach(e=>e.textContent='跨区域多城市招聘交付与人才服务全流程一体化实施方案（虚构长标题布局测试）'));
+  for(const width of [320,1281]){
+    await page.setViewportSize({width,height:900});
+    await page.waitForFunction(()=>innerWidth>=768||document.getElementById('sidebar').getBoundingClientRect().right<=1);
+    await assertTemplateLayout();
+    await page.locator('.demo-template').first().screenshot({path:output+`demo-template-long-title-${width}.png`});
+  }
+  await templateHeadings.evaluateAll((elements,texts)=>elements.forEach((e,i)=>e.textContent=texts[i]),originalHeadings);
   await nav('workbench');await page.locator('#workbench').waitFor();
   assert.equal(await page.locator('#pageTitle').innerText(),'在线智能招投标Agent');
   await nav('company');assert.equal(await page.locator('#companyForm [name=name]').inputValue(),profileBefore.name);
@@ -159,5 +172,5 @@ try {
   assert.deepEqual(writes,[]);assert.deepEqual(external,[]);assert.deepEqual(errors,[]);
   await page.reload();await page.locator('#overviewView .demo-metrics').waitFor({state:'attached'});
   await nav('opportunities');await command('我的收藏');await page.getByText('暂无匹配的演示数据',{exact:true}).waitFor();
-  console.log(JSON.stringify({result:'passed',views:views.length,viewports:[1512,1280,390],apiMutations:writes.length,externalRequests:external.length,liveDataUnchanged:true,errors}));
+  console.log(JSON.stringify({result:'passed',views:views.length,viewports:[1512,1280,390],templateViewports:[320,390,768,1280,1281,1512],longTitles:true,apiMutations:writes.length,externalRequests:external.length,liveDataUnchanged:true,errors}));
 }finally{await browser.close();}
