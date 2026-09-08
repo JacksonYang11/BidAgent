@@ -16,7 +16,7 @@ output/
 .extracted/
 .pylibs/
 # Machine-specific acceptance notes (keep locally)
-/验收记录.md
+/docs/验收记录.md
 # Third-party reference material, including alternate formats and copies
 *中指AI物业招投标Agent*
 references/
