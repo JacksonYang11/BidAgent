@@ -1,0 +1,8 @@
+{
+  "name": "whaletalk-bid-agent",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Local assets for WhaleTalk bid agent",
+  "scripts": {"assets": "node scripts/vendor.mjs"},
+  "dependencies": {"lucide": "0.468.0", "pdfjs-dist": "4.10.38"}
+}

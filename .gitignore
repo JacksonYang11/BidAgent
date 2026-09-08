@@ -1,0 +1,57 @@
+# Credentials and local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+# Customer data, generated artifacts and reference material
+data/
+samples/
+tmp/
+output/
+.extracted/
+.pylibs/
+# Internal planning and machine-specific acceptance notes (keep locally)
+/产品方案.md
+/技术方案.md
+/验收记录.md
+# Third-party reference material, including alternate formats and copies
+*中指AI物业招投标Agent*
+references/
+# Business documents and exports are not source code (case-insensitive)
+*.[pP][dD][fF]
+*.[dD][oO][cC]
+*.[dD][oO][cC][xX]
+*.[pP][pP][tT]
+*.[pP][pP][tT][xX]
+*.[xX][lL][sS]
+*.[xX][lL][sS][xX]
+*.db
+*.db-*
+*.sqlite*
+*.log
+# Dependencies and local caches
+.venv/
+venv/
+node_modules/
+.cache/
+.pytest_cache/
+__pycache__/
+*.py[cod]
+.coverage
+# Local session artifact produced during dependency test discovery
+/:memory:.ses
+audit-report*.json
+htmlcov/
+test-results/
+playwright-report/
+.DS_Store
+.idea/
+.vscode/
+.codex/
+# Third-party browser bundles are restored by setup
+app/static/vendor/
