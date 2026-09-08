@@ -33,6 +33,27 @@ try {
   const dialog=page.locator('#demoDialog');
   const close=async()=>{await page.locator('#demoDialogClose').click();};
   const command=async(name)=>(await dialog.isVisible()?dialog:page).getByRole('button',{name,exact:true}).click();
+  const assertTemplateLayout=async()=>{
+    const layout=await page.locator('.demo-template').evaluateAll(cards=>cards.map(card=>{
+      const rect=e=>e.getBoundingClientRect().toJSON();
+      const cover=card.querySelector('.demo-template-cover'),paper=card.querySelector('.demo-paper');
+      return {card:rect(card),cover:rect(cover),paper:rect(paper),paperContent:[...paper.children].map(rect),
+        title:rect(card.querySelector('h2')),buttons:[...card.querySelectorAll('button')].map(rect)};
+    }));
+    const contains=(outer,inner,inset=0)=>inner.left>=outer.left+inset-1&&inner.right<=outer.right-inset+1&&inner.top>=outer.top+inset-1&&inner.bottom<=outer.bottom-inset+1;
+    const width=page.viewportSize().width;
+    for(const [index,item] of layout.entries()){
+      assert.ok(contains(item.cover,item.paper,12),`Template ${index}: paper clipped or missing whitespace at ${width}px`);
+      assert.ok(item.paperContent.every(r=>contains(item.paper,r,8)),`Template ${index}: paper text overflow at ${width}px`);
+      assert.ok(contains(item.card,item.title,12),`Template ${index}: title overflow at ${width}px`);
+      assert.ok(item.buttons.every(r=>contains(item.card,r,12)),`Template ${index}: button clipping at ${width}px`);
+      assert.ok(item.buttons.every(r=>r.top>=item.title.bottom+8),`Template ${index}: title/button overlap at ${width}px`);
+      for(const peer of layout.slice(0,index).filter(p=>Math.abs(p.card.top-item.card.top)<1)){
+        assert.ok(Math.abs(peer.card.bottom-item.card.bottom)<1,`Unequal template row heights at ${width}px`);
+        assert.ok(Math.abs(peer.buttons[0].top-item.buttons[0].top)<1,`Misaligned template actions at ${width}px`);
+      }
+    }
+  };
   await nav('opportunities');
   assert.equal(await page.locator('#opportunitiesView tbody tr').count(),12);
   await page.getByRole('searchbox',{name:'搜索项目或采购单位'}).fill('云溪');
@@ -120,8 +141,14 @@ try {
     for(const view of views){
       await nav(view);
       assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,view+' overflow at '+width);
+      if(view==='templates')await assertTemplateLayout();
       await page.screenshot({path:output+`demo-${view}-${width}.png`,fullPage:true});
     }
+  }
+  for(const width of [320,768,1281]){
+    await page.setViewportSize({width,height:900});await nav('templates');await assertTemplateLayout();
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'templates overflow at '+width);
+    await page.screenshot({path:output+`demo-templates-${width}.png`,fullPage:true});
   }
   await nav('workbench');await page.locator('#workbench').waitFor();
   assert.equal(await page.locator('#pageTitle').innerText(),'在线智能招投标Agent');

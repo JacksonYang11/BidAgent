@@ -159,7 +159,16 @@ export function initDemo({navigate}) {
     const filters=row(search('搜索模板',v=>{templateQuery=v;renderTemplates();}),select('模板类别',['全部','招聘服务','人力资源外包','劳务派遣','综合后勤'],templateType,v=>{templateType=v;renderTemplates();}));filters.classList.add('demo-filters');templateGrid=node('div','demo-template-grid');root.append(filters,templateGrid);renderTemplates();}
   const extraTemplates=[],extraAssets=[];
   function renderTemplates(){if(!templateGrid)return;templateGrid.replaceChildren();const filtered=[...templates,...extraTemplates].filter(t=>(templateType==='全部'||t.type===templateType)&&t.name.includes(templateQuery));
-    for(const t of filtered){const card=node('article','demo-template'),cover=node('div','demo-template-cover'),sheet=node('div','demo-paper');sheet.append(node('span','demo-caption','投标方案 / SAMPLE'),node('strong','',t.name));t.chapters.slice(0,3).forEach((c,i)=>sheet.append(node('p','',`${i+1}. ${c}`)));cover.append(sheet);card.append(cover,row(tag(t.type),tag(t.source,'info')),node('h2','',t.name),node('p','demo-caption',`示例引用 ${t.uses} 次 · 示例质量分 ${t.quality}`),row(action('预览','eye',()=>templateDetail(t)),action(memory.selectedTemplate===t.id?'已选入预览':'选入编制预览','notebook-tabs',()=>useTemplate(t),'primary')));templateGrid.append(card);}
+    for(const t of filtered){
+      const card=node('article','demo-template'),cover=node('div','demo-template-cover'),sheet=node('div','demo-paper');
+      sheet.append(node('span','demo-caption','投标方案 / SAMPLE'),node('strong','',t.name));
+      t.chapters.slice(0,3).forEach((c,i)=>sheet.append(node('p','',`${i+1}. ${c}`)));cover.append(sheet);
+      const info=node('div','demo-template-info');
+      info.append(row(tag(t.type),tag(t.source,'info')),node('h2','',t.name),node('p','demo-caption',`示例引用 ${t.uses} 次 · 示例质量分 ${t.quality}`));
+      const actions=node('div','demo-template-actions');
+      actions.append(action('预览','eye',()=>templateDetail(t)),action(memory.selectedTemplate===t.id?'已选入预览':'选入编制预览','notebook-tabs',()=>useTemplate(t),'primary'));
+      card.append(cover,info,actions);templateGrid.append(card);
+    }
     if(!filtered.length)templateGrid.append(node('p','empty-row','暂无匹配模板'));icons();}
   function templateDetail(t){const list=node('ol','demo-timeline');t.chapters.forEach(c=>list.append(node('li','',c)));show(t.name,section('模板目录示例',list),[action('关闭',null,close),action('选入编制预览','notebook-tabs',()=>{useTemplate(t);close();go('planning');},'primary')]);}
   function useTemplate(t){memory.selectedTemplate=t.id;memory.planMode='模板';memory.plan=t.chapters.map((title,i)=>({id:'template-chapter-'+i,title,weight:Math.floor(100/t.chapters.length)+(i<100%t.chapters.length?1:0),text:'本章为模板预览内容。具体条款、企业事实与服务承诺需根据真实招标文件另行编制。'}));renderTemplates();planningPage();toast('模板已选入编制预览，不改变真实标书。');}

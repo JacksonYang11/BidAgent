@@ -97,14 +97,17 @@
 .demo-review-item>.button {flex-shrink:0}
 .demo-review-item blockquote {margin:8px 0;padding:8px 14px;border-left:3px solid #cbd5e1;background:white;color:#475569;font-size:13px}
 .demo-template-grid {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-.demo-template {background:white;border:1px solid var(--border);border-radius:8px;overflow:hidden;padding:18px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px}
-.demo-template h2 {font-size:15px}
-.demo-template>.demo-row:last-child {margin-top:auto;gap:8px}
-.demo-template .button {font-size:12px;padding:0 10px;flex:1}
-.demo-template-cover {height:164px;overflow:hidden;background:#eef3f7;padding:16px 28px 0;border-bottom:1px solid var(--border);margin:-18px -18px 4px}
-.demo-paper {min-height:180px;background:white;border:1px solid #dbe4ee;box-shadow:0 1px 3px #0f172a14;padding:16px;font-size:11px}
-.demo-paper strong {display:block;color:var(--color-text-primary);font-size:13px;padding:8px 0;border-bottom:2px solid var(--color-primary)}
-.demo-paper p {margin-top:5px;font-size:10px;color:#64748b}
+.demo-template {background:white;border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);display:flex;flex-direction:column}
+.demo-template-cover {min-height:204px;background:#f8fafc;padding:16px 20px;border-radius:8px 8px 0 0;display:grid;place-items:center;flex-shrink:0}
+.demo-template .demo-paper {width:100%;max-width:320px;min-height:172px;background:white;border:1px solid #dbe4ee;box-shadow:0 1px 3px #0f172a14;padding:14px;font-size:11px;overflow-wrap:anywhere}
+.demo-template .demo-paper strong {display:flex;align-items:center;min-height:48px;color:var(--color-text-primary);font-size:13px;line-height:1.5;padding:6px 0;border-bottom:2px solid var(--color-primary)}
+.demo-template .demo-paper p {margin-top:5px;font-size:10px;line-height:1.5;color:#64748b}
+.demo-template-info {display:flex;flex-direction:column;gap:8px;padding:16px 20px;flex:1}
+.demo-template-info>.demo-row {gap:8px}
+.demo-template h2 {font-size:15px;line-height:1.6;overflow-wrap:anywhere}
+.demo-template-actions {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:8px;margin:0 20px 20px;padding-top:12px;border-top:1px solid #f1f5f9}
+.demo-template-actions .button {font-size:12px;line-height:1.5;padding:8px 10px;height:auto;min-height:36px;white-space:normal;overflow-wrap:anywhere}
+.demo-template-actions .button svg {flex-shrink:0}
 .demo-plan-controls {display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px 24px;padding:20px 0;border-bottom:1px solid var(--border)}
 .demo-plan-controls .demo-segmented {margin:0}
 .demo-outline-row {flex-wrap:nowrap;gap:6px;padding:12px 0;border-bottom:1px solid var(--border)}
