@@ -15,9 +15,7 @@ tmp/
 output/
 .extracted/
 .pylibs/
-# Internal planning and machine-specific acceptance notes (keep locally)
-/产品方案.md
-/技术方案.md
+# Machine-specific acceptance notes (keep locally)
 /验收记录.md
 # Third-party reference material, including alternate formats and copies
 *中指AI物业招投标Agent*
